@@ -1,93 +1,33 @@
-name: 🚀 Space Impact CI/CD
+name: 🚀 Deploy Space Impact
 
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
 
 jobs:
-
-  # 🔍 CI - Code Quality & Validation
-  ci:
-    name: 🧪 Lint & Validate
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: 📥 Checkout Code
-        uses: actions/checkout@v3
-
-      - name: 🟢 Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-
-      - name: 📦 Install Dependencies
-        run: npm install || true
-
-      - name: 🔍 Run ESLint
-        run: npx eslint . || true
-
-      - name: ✅ Validate HTML
-        run: |
-          npm install -g htmlhint
-          htmlhint "**/*.html" || true
-
-      - name: 🎨 Validate CSS
-        run: |
-          npm install -g stylelint stylelint-config-standard
-          stylelint "**/*.css" || true
-
-
-  # 📦 Build Stage (optional optimization)
-  build:
-    name: 📦 Build Project
-    runs-on: ubuntu-latest
-    needs: ci
-
-    steps:
-      - name: 📥 Checkout Code
-        uses: actions/checkout@v3
-
-      - name: 📁 Prepare Build Folder
-        run: |
-          mkdir dist
-          cp -r * dist || true
-
-      - name: 📤 Upload Artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: game-build
-          path: dist
-
-
-  # 🚀 Deployment to GitHub Pages
   deploy:
-    name: 🚀 Deploy to GitHub Pages
     runs-on: ubuntu-latest
-    needs: build
 
     permissions:
       pages: write
       id-token: write
 
-    environment:
-      name: github-pages
-
     steps:
-      - name: 📥 Download Build
-        uses: actions/download-artifact@v3
-        with:
-          name: game-build
-          path: dist
+      - name: 📥 Checkout
+        uses: actions/checkout@v3
 
-      - name: 🚀 Setup Pages
+      - name: 📁 Setup Pages
         uses: actions/configure-pages@v3
 
-      - name: 📤 Upload to Pages
+      - name: 📦 Prepare Files
+        run: |
+          mkdir dist
+          cp -r * dist
+
+      - name: 📤 Upload
         uses: actions/upload-pages-artifact@v2
         with:
           path: dist
 
-      - name: 🌐 Deploy
+      - name: 🚀 Deploy
         uses: actions/deploy-pages@v2
